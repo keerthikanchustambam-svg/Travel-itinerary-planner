@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register – WanderAI</title>
+  <meta name="description" content="Create your free WanderAI account to start generating AI-powered travel itineraries." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="auth-page">
+    <div class="auth-container">
+      <!-- Left decorative panel -->
+      <div class="auth-hero">
+        <div style="position:relative; z-index:1;">
+          <div class="navbar-brand" style="margin-bottom:2rem; font-size:1.6rem;">
+            <span class="brand-icon">✈️</span> WanderAI
+          </div>
+          <h1>Start Your<br/>Journey Today! 🚀</h1>
+          <p>Create a free account and let AI plan your next perfect adventure — in seconds, not hours.</p>
+          <ul class="auth-hero-features">
+            <li><span>✅</span> 100% free to get started</li>
+            <li><span>🤖</span> Google Gemini AI itineraries</li>
+            <li><span>💾</span> Save unlimited trip plans</li>
+            <li><span>🔒</span> Your data stays private</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right: Register Form -->
+      <div class="auth-form-section">
+        <h2>Create Account</h2>
+        <p class="subtitle">Already have an account? <a href="login.html">Sign in →</a></p>
+
+        <!-- Error banner -->
+        <div id="reg-error" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:var(--radius-md); padding:0.85rem 1rem; font-size:0.875rem; color:#f87171; margin-bottom:1.5rem;"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <div class="input-icon-group">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-control"
+                placeholder="John Doe"
+                autocomplete="name"
+                required
+              />
+            </div>
+            <span class="form-error" id="name-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <div class="input-icon-group">
+              <span class="input-icon">📧</span>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <span class="form-error" id="email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-icon-group">
+              <span class="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Min. 6 characters"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+            <span class="form-error" id="password-error"></span>
+
+            <!-- Password strength meter -->
+            <div style="margin-top:0.5rem;">
+              <div style="height:4px; background:var(--border); border-radius:var(--radius-full); overflow:hidden;">
+                <div id="pwd-strength-bar" style="height:100%; width:0; border-radius:var(--radius-full); transition:all 0.3s;"></div>
+              </div>
+              <span id="pwd-strength-label" class="form-hint"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm Password</label>
+            <div class="input-icon-group">
+              <span class="input-icon">🔒</span>
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirmPassword"
+                class="form-control"
+                placeholder="Repeat your password"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+            <span class="form-error" id="confirm-error"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="register-btn">
+            Create Free Account →
+          </button>
+        </form>
+
+        <p style="text-align:center; margin-top:1.5rem; font-size:0.8rem; color:var(--text-muted);">
+          By signing up you agree to use this platform for educational purposes.
+        </p>
+        <p style="text-align:center; margin-top:1rem; font-size:0.8rem; color:var(--text-muted);">
+          <a href="index.html" style="color:var(--text-muted);">← Back to Home</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+  <script src="js/auth.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (localStorage.getItem('wanderai_token')) {
+      window.location.href = 'dashboard.html';
+    }
+
+    const API = 'http://localhost:5000/api';
+
+    // ── Password strength ─────────────────────────────────
+    document.getElementById('password').addEventListener('input', function () {
+      const val = this.value;
+      const bar = document.getElementById('pwd-strength-bar');
+      const lbl = document.getElementById('pwd-strength-label');
+      let strength = 0;
+      if (val.length >= 6)  strength++;
+      if (val.length >= 10) strength++;
+      if (/[A-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+      if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+      const levels = [
+        { w: '0',    color: '',                  text: '' },
+        { w: '30%',  color: '#ef4444',            text: 'Weak' },
+        { w: '60%',  color: '#f59e0b',            text: 'Fair' },
+        { w: '80%',  color: '#3b82f6',            text: 'Good' },
+        { w: '100%', color: 'var(--success)',      text: 'Strong' }
+      ];
+      const lvl = levels[strength] || levels[0];
+      bar.style.width           = lvl.w;
+      bar.style.background      = lvl.color;
+      lbl.textContent           = lvl.text;
+      lbl.style.color           = lvl.color;
+    });
+
+    // ── Form submit ───────────────────────────────────────
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm-password').value;
+      const btn      = document.getElementById('register-btn');
+
+      let valid = true;
+      if (!name || name.length < 2) {
+        showFieldError('name', 'Name must be at least 2 characters.');
+        valid = false;
+      }
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        showFieldError('email', 'Please enter a valid email address.');
+        valid = false;
+      }
+      if (!password || password.length < 6) {
+        showFieldError('password', 'Password must be at least 6 characters.');
+        valid = false;
+      }
+      if (password !== confirm) {
+        showFieldError('confirm', 'Passwords do not match.');
+        valid = false;
+      }
+      if (!valid) return;
+
+      setLoading(btn, true, 'Creating account...');
+
+      try {
+        const res  = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+        localStorage.setItem('wanderai_token', data.token);
+        localStorage.setItem('wanderai_user',  JSON.stringify(data.user));
+
+        showToast('success', 'Account Created!', data.message);
+        setTimeout(() => window.location.href = 'dashboard.html', 900);
+      } catch (err) {
+        document.getElementById('reg-error').style.display = 'block';
+        document.getElementById('reg-error').textContent   = err.message;
+        setLoading(btn, false, 'Create Free Account →');
+      }
+    });
+
+    function clearErrors() {
+      document.getElementById('reg-error').style.display = 'none';
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+      document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+    }
+    function showFieldError(field, msg) {
+      const errEl = document.getElementById(`${field}-error`);
+      if (errEl) errEl.textContent = msg;
+      const inputEl = document.getElementById(field === 'confirm' ? 'confirm-password' : field);
+      if (inputEl) inputEl.classList.add('error');
+    }
+    function setLoading(btn, loading, label) {
+      btn.disabled = loading;
+      btn.innerHTML = loading ? `<div class="spinner"></div> ${label}` : label;
+    }
+  </script>
+</body>
+</html>

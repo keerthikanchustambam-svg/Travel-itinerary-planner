@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Itinerary – WanderAI</title>
+  <meta name="description" content="View your AI-generated travel itinerary with day-by-day plans, hotel picks, restaurants, and expense estimates." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand"><span class="brand-icon">✈️</span> WanderAI</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="planner.html">Plan Trip</a></li>
+      <li><a href="dashboard.html">My Trips</a></li>
+    </ul>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+      <div class="navbar-user">
+        <div class="avatar" id="nav-avatar">U</div>
+        <span id="nav-username">User</span>
+        <button onclick="logout()" class="btn btn-sm" style="padding:0.3rem 0.7rem; font-size:0.75rem; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); border-radius:6px; margin-left:0.5rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="itinerary-page">
+    <div class="container">
+
+      <!-- Action Bar -->
+      <div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; align-items:center;">
+        <a href="javascript:history.back()" class="btn btn-secondary btn-sm">← Back</a>
+        <button id="save-btn" class="btn btn-primary btn-sm" style="display:none;">
+          💾 Save Itinerary
+        </button>
+        <button id="saved-badge" style="display:none;" class="btn btn-sm" disabled style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">
+          ✅ Saved to My Trips
+        </button>
+        <a href="planner.html" class="btn btn-secondary btn-sm" style="margin-left:auto;">
+          🔄 Plan Another Trip
+        </a>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" style="text-align:center; padding:5rem; display:none;">
+        <div class="loader-ring" style="margin:0 auto 1.5rem;"></div>
+        <p style="color:var(--text-secondary);">Loading itinerary...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="error-state" style="display:none;" class="empty-state">
+        <div class="empty-state-icon">❌</div>
+        <h3>Could not load itinerary</h3>
+        <p id="error-msg">Something went wrong.</p>
+        <a href="dashboard.html" class="btn btn-primary">← Go to My Trips</a>
+      </div>
+
+      <!-- Itinerary Content (hidden until loaded) -->
+      <div id="itinerary-content" style="display:none;">
+
+        <!-- Hero Banner -->
+        <div class="itinerary-hero">
+          <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;" id="destination-badge">
+            📍 Destination
+          </div>
+          <h1 id="itinerary-title">Trip Itinerary</h1>
+          <p id="itinerary-overview" style="color:var(--text-secondary); max-width:700px; margin:0 auto; font-size:0.95rem; line-height:1.7;"></p>
+
+          <!-- Trip Meta Grid -->
+          <div class="trip-meta-grid" id="trip-meta-grid"></div>
+        </div>
+
+        <!-- Expense Summary Card -->
+        <div class="expense-card" id="expense-card">
+          <div class="expense-header">
+            <div>
+              <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.25rem;">💰 Estimated Total Cost</div>
+              <div class="expense-total" id="expense-total">$0</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.25rem;">🎯 Your Budget</div>
+              <div style="font-size:1.5rem; font-weight:700; color:var(--text-primary);" id="budget-display">$0</div>
+            </div>
+          </div>
+
+          <!-- Budget Bar -->
+          <div>
+            <div class="budget-bar">
+              <div class="budget-fill" id="budget-fill" style="width:0%;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
+              <span id="budget-status"></span>
+              <span id="budget-percent"></span>
+            </div>
+          </div>
+
+          <!-- Per-day cost table -->
+          <div style="margin-top:1.5rem;">
+            <div class="info-section-title">📊 Daily Cost Breakdown</div>
+            <div id="daily-cost-table" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:0.75rem;"></div>
+          </div>
+        </div>
+
+        <!-- Travel Tips -->
+        <div id="tips-section" style="margin-bottom:1.5rem; display:none;">
+          <div class="expense-card">
+            <div class="info-section-title" style="margin-bottom:1rem;">💡 Travel Tips</div>
+            <div class="tips-grid" id="tips-grid"></div>
+          </div>
+        </div>
+
+        <!-- Day Selector Tabs -->
+        <div class="day-tabs" id="day-tabs"></div>
+
+        <!-- Day Cards Container -->
+        <div id="days-container"></div>
+
+      </div><!-- /itinerary-content -->
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/itinerary.js"></script>
+</body>
+</html>

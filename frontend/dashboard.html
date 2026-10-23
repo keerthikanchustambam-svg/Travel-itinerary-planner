@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Trips – WanderAI</title>
+  <meta name="description" content="View all your saved AI-generated travel itineraries in one place." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand"><span class="brand-icon">✈️</span> WanderAI</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="planner.html">Plan Trip</a></li>
+      <li><a href="dashboard.html" class="active">My Trips</a></li>
+    </ul>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+      <div class="navbar-user">
+        <div class="avatar" id="nav-avatar">U</div>
+        <span id="nav-username">User</span>
+        <button onclick="logout()" class="btn btn-sm" style="padding:0.3rem 0.7rem; font-size:0.75rem; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); border-radius:6px; margin-left:0.5rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main style="position:relative; z-index:1; min-height:100vh; padding-bottom:4rem;">
+    <div class="container">
+      <!-- Header -->
+      <div class="dashboard-header">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h1 class="page-title">My Trips <span id="trip-count" style="font-size:1rem; font-weight:500; color:var(--text-muted);"></span></h1>
+            <p class="page-subtitle">All your AI-generated travel itineraries, saved in one place.</p>
+          </div>
+          <a href="planner.html" class="btn btn-primary">
+            ✈️ Plan New Trip
+          </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div style="margin-top:1.5rem; max-width:400px;">
+          <div class="input-icon-group">
+            <span class="input-icon">🔍</span>
+            <input
+              type="text"
+              id="search-input"
+              class="form-control"
+              placeholder="Search by destination..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading-state" style="text-align:center; padding:4rem; color:var(--text-secondary);">
+        <div class="loader-ring" style="margin:0 auto 1rem;"></div>
+        <p>Loading your trips...</p>
+      </div>
+
+      <!-- Trips Grid -->
+      <div class="trips-grid" id="trips-grid" style="display:none;"></div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <div class="empty-state-icon">🗺️</div>
+        <h3>No trips planned yet!</h3>
+        <p>Generate your first AI-powered travel itinerary and save it here.</p>
+        <a href="planner.html" class="btn btn-primary btn-lg">
+          🤖 Plan My First Trip
+        </a>
+      </div>
+
+      <!-- No results for search -->
+      <div id="no-results" class="empty-state" style="display:none;">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No trips found</h3>
+        <p>No saved trips match "<span id="search-term"></span>".</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

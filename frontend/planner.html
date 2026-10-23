@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan a Trip – WanderAI</title>
+  <meta name="description" content="Enter your travel details and let WanderAI's Gemini AI generate a complete personalized itinerary for you." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand"><span class="brand-icon">✈️</span> WanderAI</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="planner.html" class="active">Plan Trip</a></li>
+      <li><a href="dashboard.html">My Trips</a></li>
+    </ul>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+      <div class="navbar-user">
+        <div class="avatar" id="nav-avatar">U</div>
+        <span id="nav-username">User</span>
+        <button onclick="logout()" class="btn btn-sm" style="padding:0.3rem 0.7rem; font-size:0.75rem; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); border-radius:6px; margin-left:0.5rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loader-ring"></div>
+    <div>
+      <div class="loading-text">🤖 AI is planning your trip...</div>
+      <div class="loading-sub">Gemini is crafting your personalized itinerary. This may take 15–30 seconds.</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="planner-page">
+    <div class="container">
+      <!-- Header -->
+      <div class="planner-header">
+        <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;">
+          <span>🗺️</span> Trip Planner
+        </div>
+        <h1 style="font-size:clamp(1.8rem,4vw,2.5rem);">
+          Where Do You Want To <span class="gradient-text">Go?</span>
+        </h1>
+        <p style="color:var(--text-secondary); margin-top:0.75rem; max-width:500px; margin-left:auto; margin-right:auto;">
+          Fill in your trip details below and our AI will generate a complete, personalized itinerary for you.
+        </p>
+      </div>
+
+      <!-- Error banner -->
+      <div id="form-error" style="display:none; max-width:800px; margin:0 auto 1.5rem; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:var(--radius-md); padding:0.85rem 1rem; font-size:0.875rem; color:#f87171;"></div>
+
+      <form id="planner-form" class="planner-form" novalidate>
+
+        <!-- Section 1: Destination -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span>📍</span> Destination
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="destination">Where are you going?</label>
+            <div class="input-icon-group">
+              <span class="input-icon">🌍</span>
+              <input
+                type="text"
+                id="destination"
+                class="form-control"
+                placeholder="e.g. Paris, France or Tokyo, Japan"
+                required
+              />
+            </div>
+            <span class="form-error" id="destination-error"></span>
+          </div>
+        </div>
+
+        <!-- Section 2: Dates -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span>📅</span> Travel Dates
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="start-date">Start Date</label>
+              <input type="date" id="start-date" class="form-control" required />
+              <span class="form-error" id="start-date-error"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="end-date">End Date</label>
+              <input type="date" id="end-date" class="form-control" required />
+              <span class="form-error" id="end-date-error"></span>
+            </div>
+          </div>
+          <div id="duration-display" style="font-size:0.85rem; color:var(--secondary-light); font-weight:600; display:none;">
+            ✨ <span id="duration-text"></span>
+          </div>
+        </div>
+
+        <!-- Section 3: Budget & Travelers -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span>💰</span> Budget & Group
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="budget">Total Budget (USD $)</label>
+              <div class="input-icon-group">
+                <span class="input-icon">💵</span>
+                <input
+                  type="number"
+                  id="budget"
+                  class="form-control"
+                  placeholder="e.g. 2000"
+                  min="1"
+                  required
+                />
+              </div>
+              <span class="form-error" id="budget-error"></span>
+              <span class="form-hint" id="per-person-hint"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="travelers">Number of Travelers</label>
+              <div class="input-icon-group">
+                <span class="input-icon">👥</span>
+                <input
+                  type="number"
+                  id="travelers"
+                  class="form-control"
+                  placeholder="e.g. 2"
+                  min="1"
+                  max="50"
+                  value="1"
+                  required
+                />
+              </div>
+              <span class="form-error" id="travelers-error"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Interests -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span>❤️</span> Your Interests
+            <span style="font-weight:400; color:var(--text-muted); font-size:0.8rem; margin-left:auto;">Select all that apply</span>
+          </div>
+          <div class="interests-grid" id="interests-grid">
+            <div class="interest-chip" data-value="Culture & History">🏛️ Culture & History</div>
+            <div class="interest-chip" data-value="Food & Cuisine">🍜 Food & Cuisine</div>
+            <div class="interest-chip" data-value="Adventure & Outdoors">🧗 Adventure & Outdoors</div>
+            <div class="interest-chip" data-value="Shopping">🛍️ Shopping</div>
+            <div class="interest-chip" data-value="Art & Museums">🎨 Art & Museums</div>
+            <div class="interest-chip" data-value="Nature & Wildlife">🌿 Nature & Wildlife</div>
+            <div class="interest-chip" data-value="Nightlife & Entertainment">🎉 Nightlife</div>
+            <div class="interest-chip" data-value="Beaches & Water Sports">🏖️ Beaches</div>
+            <div class="interest-chip" data-value="Photography">📸 Photography</div>
+            <div class="interest-chip" data-value="Wellness & Spa">🧘 Wellness & Spa</div>
+            <div class="interest-chip" data-value="Religious & Spiritual">🕌 Religious & Spiritual</div>
+            <div class="interest-chip" data-value="Family Friendly">👨‍👩‍👧 Family Friendly</div>
+          </div>
+          <span class="form-hint" style="margin-top:0.75rem; display:block;">Click chips to toggle. AI uses your interests to personalize recommendations.</span>
+        </div>
+
+        <!-- Generate Button -->
+        <div style="text-align:center; margin-top:0.5rem;">
+          <button type="submit" class="btn btn-primary btn-lg" id="generate-btn" style="min-width:280px;">
+            🤖 Generate AI Itinerary
+          </button>
+          <p style="margin-top:1rem; font-size:0.8rem; color:var(--text-muted);">
+            ⏱️ Generation takes 15–30 seconds. Please be patient!
+          </p>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/planner.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WanderTavel – AI-Powered Travel Itinerary Planner</title>
+  <meta name="description" content="Plan your perfect trip with AI. Get personalized day-by-day travel itineraries, hotel recommendations, restaurant picks, and expense estimates in seconds." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+</head>
+<body>
+  <!-- Floating Background Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="brand-icon">✈️</span> WanderTravel
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="planner.html" id="nav-planner" style="display:none">Plan Trip</a></li>
+      <li><a href="dashboard.html" id="nav-dashboard" style="display:none">My Trips</a></li>
+    </ul>
+    <div id="nav-auth-area" style="margin-left:1rem; display:flex; gap:0.5rem;">
+      <a href="register.html" class="btn btn-secondary btn-sm">Sign Up</a>
+      <a href="login.html" class="btn btn-primary btn-sm">Login</a>
+    </div>
+    <div id="nav-user-area" style="display:none; margin-left:1rem;">
+      <div class="navbar-user">
+        <div class="avatar" id="nav-avatar">U</div>
+        <span id="nav-username">User</span>
+        <button onclick="logout()" class="btn btn-sm" style="padding:0.3rem 0.7rem; font-size:0.75rem; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); border-radius:6px; margin-left:0.5rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div style="position:relative; z-index:1; width:100%;">
+      <div style="max-width:900px; margin:0 auto; text-align:center;">
+        <div class="hero-badge">
+
+        </div>
+        <h1>
+          Plan Your Dream Trip<br/>
+          <span class="gradient-text">With Artificial Intelligence</span>
+        </h1>
+        <p>
+          Enter your destination, budget, and interests — our AI builds a complete
+          day-by-day itinerary with attractions, hotels, restaurants, and expense breakdowns in seconds.
+        </p>
+        <div class="hero-actions">
+          <a href="planner.html" class="btn btn-primary btn-lg" id="cta-plan">
+            🗺️ Plan My Trip
+          </a>
+          <a href="register.html" class="btn btn-secondary btn-lg" id="cta-signup">
+            🚀 Get Started Free
+          </a>
+        </div>
+
+        <!-- Hero Stats -->
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-number">AI</div>
+            <div class="stat-label">Powered Planning</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Destinations</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">Free</div>
+            <div class="stat-label">To Get Started</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" style="position:relative; z-index:1;">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything You Need to <span class="gradient-text">Travel Smarter</span></h2>
+        <p>From AI-generated itineraries to curated hotel picks — we've got your entire trip covered.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card animate-fadeIn animate-delay-1">
+          <div class="feature-icon">🤖</div>
+          <h3>AI Itinerary Generator</h3>
+          <p>Google Gemini AI creates personalized day-by-day plans based on your interests, budget, and travel style.</p>
+        </div>
+        <div class="feature-card animate-fadeIn animate-delay-2">
+          <div class="feature-icon">🏨</div>
+          <h3>Hotel Recommendations</h3>
+          <p>Get curated hotel suggestions for every day of your trip, complete with ratings and price estimates.</p>
+        </div>
+        <div class="feature-card animate-fadeIn animate-delay-3">
+          <div class="feature-icon">🍽️</div>
+          <h3>Restaurant Picks</h3>
+          <p>Discover the best local restaurants for breakfast, lunch, and dinner — with must-try dish suggestions.</p>
+        </div>
+        <div class="feature-card animate-fadeIn animate-delay-1">
+          <div class="feature-icon">💰</div>
+          <h3>Expense Estimation</h3>
+          <p>See a detailed cost breakdown per day and for the entire trip. Know exactly how much to budget.</p>
+        </div>
+        <div class="feature-card animate-fadeIn animate-delay-2">
+          <div class="feature-icon">💾</div>
+          <h3>Save & Access Anytime</h3>
+          <p>Save your generated itineraries to your account and revisit them whenever you need, from any device.</p>
+        </div>
+        <div class="feature-card animate-fadeIn animate-delay-3">
+          <div class="feature-icon">🔒</div>
+          <h3>Secure & Private</h3>
+          <p>Your API keys stay on the server. Your trips are private to your account with JWT authentication.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section" style="position:relative; z-index:1; background: rgba(124,58,237,0.03); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>From signup to itinerary in under 2 minutes.</p>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:2rem; max-width:900px; margin:0 auto;">
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:white; margin:0 auto 1rem;">1</div>
+          <h3 style="font-size:1rem; margin-bottom:0.5rem;">Create Account</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Sign up in seconds with your name, email and password.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:white; margin:0 auto 1rem;">2</div>
+          <h3 style="font-size:1rem; margin-bottom:0.5rem;">Enter Trip Details</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Tell us your destination, dates, budget, and interests.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:white; margin:0 auto 1rem;">3</div>
+          <h3 style="font-size:1rem; margin-bottom:0.5rem;">AI Generates Plan</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Gemini AI creates your personalized itinerary in seconds.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:white; margin:0 auto 1rem;">4</div>
+          <h3 style="font-size:1rem; margin-bottom:0.5rem;">Save & Travel!</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">Save your plan and start packing. Adventure awaits!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="position:relative; z-index:1; text-align:center;">
+    <div class="container">
+      <div style="max-width:600px; margin:0 auto;">
+        <h2 style="font-size:clamp(1.8rem,4vw,2.5rem); margin-bottom:1rem;">Ready to Explore the World?</h2>
+        <p style="color:var(--text-secondary); margin-bottom:2rem;">Join thousands of travelers who plan smarter with AI.</p>
+        <a href="register.html" class="btn btn-primary btn-lg" id="cta-bottom">
+          ✈️ Start Planning for Free
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top: 1px solid var(--border); padding: 2rem; text-align:center; color:var(--text-muted); font-size:0.85rem; position:relative; z-index:1;">
+    <div class="navbar-brand" style="justify-content:center; margin-bottom:0.75rem;">
+      <span class="brand-icon">✈️</span> WanderAI
+    </div>
+    <p style="margin-top:0.5rem;">© 2024 WanderAI. For educational purposes.</p>
+  </footer>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    // Update navbar based on login state
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('wanderai_token');
+      const user  = JSON.parse(localStorage.getItem('wanderai_user') || 'null');
+      if (token && user) {
+        document.getElementById('nav-auth-area').style.display  = 'none';
+        document.getElementById('nav-user-area').style.display  = 'flex';
+        document.getElementById('nav-planner').style.display    = 'block';
+        document.getElementById('nav-dashboard').style.display  = 'block';
+        document.getElementById('nav-username').textContent     = user.name.split(' ')[0];
+        document.getElementById('nav-avatar').textContent       = user.name.charAt(0).toUpperCase();
+        // If logged in, CTA goes to planner
+        document.getElementById('cta-plan').href   = 'planner.html';
+        document.getElementById('cta-signup').href = 'dashboard.html';
+        document.getElementById('cta-signup').textContent = '📋 My Trips';
+        document.getElementById('cta-bottom').href = 'planner.html';
+        document.getElementById('cta-bottom').textContent = '🗺️ Plan a New Trip';
+      }
+    });
+  </script>
+</body>
+</html>
