@@ -79,9 +79,20 @@ app.use('/api/auth', authRoutes);
 app.use('/api/itinerary', itineraryRoutes);
 
 // 404 handler
+// Root route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Travel Itinerary Planner API is running',
+    health: '/api/health'
+  });
+});
+
+// 404 handler — keep this after all valid routes
 app.use((req, res) => {
   res.status(404).json({
-    error: 'Route not found'
+    error: 'Route not found',
+    path: req.originalUrl
   });
 });
 
