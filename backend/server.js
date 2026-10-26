@@ -1,92 +1,121 @@
-// ============================================================
-// server.js – The main entry point of our Express application
-// ============================================================
-// Think of this as the "front door" of our backend.
-// It sets up all the middleware (security, parsing, etc.)
-// and connects all the route handlers together.
-// ============================================================
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
-const dns = require('node:dns');
-
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-
-require('dotenv').config();
-require('dotenv').config(); // Load .env variables first!
 
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
 
-// Initialize the Express app
 const app = express();
 
-// ── Connect to MongoDB ──────────────────────────────────────
-connectDB();
-
-// ── Security Middleware ─────────────────────────────────────
-// helmet() adds important HTTP security headers automatically
 app.use(helmet());
 
-// cors() allows our frontend (different origin) to talk to this backend
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://127.0.0.1:5500',
+  'http://localhost:5500'
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: (origin, callback) => {
+    // Allow requests without an Origin header, such as health checks.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origin not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate limiting – prevents abuse (e.g., bots spamming our API)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                  // max 100 requests per 15 min per IP
-  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
-});
-app.use('/api', limiter);
-
-// Stricter limit for AI generation (it's expensive!)
-const aiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,                   // max 10 AI generations per hour per IP
-  message: { error: 'AI generation limit reached. Please wait an hour before generating again.' }
-});
-app.use('/api/itinerary/generate', aiLimiter);
-
-// ── Body Parsing Middleware ─────────────────────────────────
-// Allows Express to read JSON bodies from incoming requests
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ── API Routes ──────────────────────────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use('/api', apiLimiter);
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use('/api/itinerary/generate', aiLimiter);
+
+// Health check
+app.get('/api/health', async (req, res) => {
+  try {
+    await connectDB();
+
+    res.status(200).json({
+      status: 'OK',
+      message: 'Travel Itinerary Planner API is running!',
+      database: 'connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Health check failed:', error.message);
+
+    res.status(503).json({
+      status: 'ERROR',
+      message: 'Database connection failed.'
+    });
+  }
+});
+
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/itinerary', itineraryRoutes);
 
-// ── Health Check ────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Travel Itinerary Planner API is running!', timestamp: new Date().toISOString() });
-});
-
-// ── 404 Handler ─────────────────────────────────────────────
+// 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// ── Global Error Handler ────────────────────────────────────
-// If any route throws an error, it ends up here
-app.use((err, req, res, next) => {
-  console.error('❌ Server Error:', err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  res.status(404).json({
+    error: 'Route not found'
   });
 });
 
-// ── Start Server ────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📋 API Health: http://localhost:${PORT}/api/health`);
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Server Error:', err.message);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.status || 500).json({
+    error: process.env.NODE_ENV === 'production'
+      ? 'Internal Server Error'
+      : err.message
+  });
 });
+
+// Export Express app for Vercel serverless functions.
+module.exports = app;
+
+// Start a regular server only when running locally.
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+
+  connectDB()
+    .then(() => {
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Health endpoint: http://localhost:${PORT}/api/health`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to start server:', error.message);
+      process.exit(1);
+    });
+}
